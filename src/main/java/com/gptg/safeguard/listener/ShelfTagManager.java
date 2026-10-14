@@ -84,9 +84,8 @@ public class ShelfTagManager implements Listener {
                 td.setBackgroundColor(org.bukkit.Color.fromARGB(0, 0, 0, 0));
                 td.setPersistent(true);
                 td.getPersistentDataContainer().set(plugin.getShelfTagKey(), PersistentDataType.STRING, material.name());
-                // Let eligible viewers enter normal entity tracking. The tracking
-                // event below rejects modern viewers BEFORE a spawn packet is sent.
-                td.setVisibleByDefault(true);
+                // Hidden by default — only legacy/Bedrock viewers are shown via showEntity().
+                td.setVisibleByDefault(false);
             });
         } catch (RuntimeException ex) {
             plugin.getLogger().log(java.util.logging.Level.WARNING, "Shelf TextDisplay spawn failed at " + loc, ex);
@@ -95,14 +94,12 @@ public class ShelfTagManager implements Listener {
         debug("Shelf TextDisplay spawned: uuid=" + display.getUniqueId() + " valid=" + display.isValid()
                 + " location=" + loc + " text=" + formatted);
 
-        // Langsung tampilkan ke player Bedrock yang sedang online & dekat lokasi ini.
+        // Langsung tampilkan ke player legacy/Bedrock yang sedang online & dekat lokasi ini.
         int viewers = 0;
         for (Player online : Bukkit.getOnlinePlayers()) {
             if (LegacyClientUtil.needsShelfLabel(plugin, online) && online.getWorld().equals(display.getWorld())) {
-                applyVisibility(online, display, true);
+                online.showEntity(plugin, display);
                 viewers++;
-            } else if (online.getWorld().equals(display.getWorld())) {
-                applyVisibility(online, display, false);
             }
         }
         debug("Shelf TextDisplay visibility: uuid=" + display.getUniqueId() + " eligibleViewers=" + viewers
@@ -134,10 +131,11 @@ public class ShelfTagManager implements Listener {
                         .replace("%version%", plugin.getConfigManager().getTagVersionLabel())
                         .replace("%block%", toPrettyName(type));
                 td.text(plugin.getMessages().getMiniMessage().deserialize(formatted));
-                // Migrate tags from previous builds' hidden-by-default state.
-                if (!td.isVisibleByDefault()) {
+                // Migrate tags from previous builds that used visibleByDefault(true).
+                if (td.isVisibleByDefault()) {
+                    td.setVisibleByDefault(false);
+                    // Hide from all players first, then re-show for eligible ones below.
                     for (Player online : Bukkit.getOnlinePlayers()) online.hideEntity(plugin, td);
-                    td.setVisibleByDefault(true);
                 }
                 applyVisibility(player, td, visible);
             }
@@ -178,11 +176,19 @@ public class ShelfTagManager implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onTrack(PlayerTrackEntityEvent event) {
         if (!(event.getEntity() instanceof TextDisplay td) || !isShelfTag(td)) return;
+        Player viewer = event.getPlayer();
         boolean eligible = plugin.getConfigManager().isTagForLegacyClients()
-                && LegacyClientUtil.needsShelfLabel(plugin, event.getPlayer());
-        if (!eligible) event.setCancelled(true);
-        debug("Shelf tracking: viewer=" + event.getPlayer().getName() + " label=" + td.getUniqueId()
-                + " eligible=" + eligible + " cancelled=" + event.isCancelled());
+                && LegacyClientUtil.needsShelfLabel(plugin, viewer);
+        // Never cancel tracking — cancelling permanently prevents showEntity() from
+        // working for this viewer/entity pair. Instead, let the entity enter the
+        // tracking pipeline and immediately hide it for non-eligible viewers.
+        if (!eligible) {
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                if (viewer.isOnline()) viewer.hideEntity(plugin, td);
+            });
+        }
+        debug("Shelf tracking: viewer=" + viewer.getName() + " label=" + td.getUniqueId()
+                + " eligible=" + eligible);
     }
 
     @EventHandler
