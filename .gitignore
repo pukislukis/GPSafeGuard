@@ -1,0 +1,5 @@
+/builds/
+/.compile.lock
+/build-version.txt.tmp
+/build-version.txt.bak
+/target/

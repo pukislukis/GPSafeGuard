@@ -1,0 +1,75 @@
+# =========================================================
+#  GPSafeGuard - messages.yml
+#  Semua pesan mendukung format MiniMessage (https://docs.advntr.dev/minimessage/format.html)
+#  Placeholder ditulis dengan <nama_placeholder> dan akan diganti sebelum di-parse,
+#  jadi AMAN dipakai di dalam tag <click:...> juga.
+# =========================================================
+
+prefix: "<dark_aqua>[SafeGuard]</dark_aqua> "
+
+general:
+  no-permission: "<prefix><red>Kamu tidak punya izin untuk melakukan ini.</red>"
+  player-not-found: "<prefix><red>Player <white><target></white> tidak ditemukan / sedang offline.</red>"
+  player-only: "<prefix><red>Perintah ini hanya bisa dijalankan oleh player.</red>"
+  reload-success: "<prefix><green>Konfigurasi GPSafeGuard berhasil di-reload.</green>"
+
+trust:
+  usage: "<prefix><yellow>Gunakan: <white>/<label> <player></white></yellow>"
+  usage-accept: "<prefix><yellow>Gunakan: <white>/trust accept [player]</white> atau <white>/trust decline [player]</white></yellow>"
+  not-in-claim: "<prefix><red>Kamu harus berdiri di dalam claim milikmu untuk memberi trust.</red>"
+  no-claim-permission: "<prefix><red>Kamu tidak punya izin untuk mengatur trust di claim ini.</red>"
+  cannot-trust-self: "<prefix><red>Kamu tidak bisa mengundang trust untuk dirimu sendiri.</red>"
+  already-trusted: "<prefix><yellow><target> sudah memiliki level trust <trust_type> atau lebih tinggi di claim ini.</yellow>"
+
+  invite-sent: "<prefix><green>Undangan <trust_type> trust dikirim ke <white><target></white>. Menunggu konfirmasi (<time>s)...</green>"
+
+  # Pesan untuk player Java yang menerima undangan trust, dengan tombol klik.
+  invite-received: |-
+    <prefix><yellow><inviter></yellow> ingin memberikan level trust <white><trust_type></white> kepada kamu di claim mereka.
+    <click:run_command:'/trust accept <inviter>'><hover:show_text:'<green>Klik untuk menerima</green>'><green><bold>[ACCEPT]</bold></green></hover></click>  <click:run_command:'/trust decline <inviter>'><hover:show_text:'<red>Klik untuk menolak</red>'><red><bold>[DECLINE]</bold></red></hover></click>
+    <gray><italic>Otomatis kadaluarsa dalam <time> detik.</italic></gray>
+
+  # Pesan untuk player Bedrock (tidak bisa klik teks), diarahkan untuk run command manual.
+  invite-received-bedrock: |-
+    <prefix><yellow><inviter></yellow> ingin memberikan level trust <white><trust_type></white> kepada kamu di claim mereka.
+    <gray>Ketik <white>/trust accept <inviter></white> untuk menerima, atau <white>/trust decline <inviter></white> untuk menolak.</gray>
+    <gray><italic>Otomatis kadaluarsa dalam <time> detik.</italic></gray>
+
+  no-pending-invite: "<prefix><red>Tidak ada undangan trust yang menunggu dari <target>.</red>"
+  no-pending-invite-any: "<prefix><red>Kamu tidak punya undangan trust yang menunggu saat ini.</red>"
+
+  accepted-target: "<prefix><green>Kamu menerima <trust_type> trust dari <white><inviter></white>.</green>"
+  accepted-inviter: "<prefix><green><white><target></white> menerima undangan <trust_type> trust kamu.</green>"
+
+  declined-target: "<prefix><yellow>Kamu menolak undangan trust dari <white><inviter></white>.</yellow>"
+  declined-inviter: "<prefix><yellow><white><target></white> menolak undangan <trust_type> trust kamu.</yellow>"
+
+  expired-target: "<prefix><gray>Undangan trust dari <inviter> telah kadaluarsa.</gray>"
+  expired-inviter: "<prefix><gray>Undangan trust kamu untuk <target> telah kadaluarsa (tidak direspon).</gray>"
+
+shelf-guard:
+  blocked-place: "<prefix><red>Block <white><block></white> tidak boleh dipasang di luar land! (berpotensi jadi trap untuk player versi lama)</red>"
+  toggled-on: "<prefix><green>Shelf block guard sekarang AKTIF.</green>"
+  toggled-off: "<prefix><yellow>Shelf block guard sekarang NONAKTIF.</yellow>"
+
+drop-fix:
+  # Kosongkan ("") untuk menonaktifkan pesan saat item dikembalikan.
+  item-returned: "<prefix><yellow>Item tidak bisa di-drop di area ini, item dikembalikan ke inventory kamu.</yellow>"
+  toggled-on: "<prefix><green>DropFix sekarang AKTIF.</green>"
+  toggled-off: "<prefix><yellow>DropFix sekarang NONAKTIF.</yellow>"
+
+admin:
+  debug-on: "<prefix><green>Debug mode diaktifkan.</green>"
+  debug-off: "<prefix><yellow>Debug mode dimatikan.</yellow>"
+  unknown-subcommand: "<prefix><red>Subcommand tidak dikenal. Gunakan: /gpsafeguard <reload|debug|shelfguard|dropfix|info></red>"
+  info: |-
+    <prefix><aqua>GPSafeGuard v<version></aqua>
+    <gray>- Trust system: <trust_status></gray>
+    <gray>- Shelf guard: <shelf_status></gray>
+    <gray>- Blacklisted blocks: <blacklist_count></gray>
+    <gray>- Ability protection: <ability_status></gray>
+    <gray>- Ability hooks: <ability_hooks></gray>
+    <gray>- DropFix protection: <dropfix_status></gray>
+
+ability-protection:
+  blocked: "<prefix><red>Ability/serangan diblokir: kamu tidak memiliki build trust pada claim yang dilindungi.</red>"

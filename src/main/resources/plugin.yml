@@ -1,0 +1,46 @@
+name: GPSafeGuard
+version: '${project.version}'
+main: com.gptg.safeguard.GPSafeGuardPlugin
+api-version: '1.21'
+author: You
+description: >
+  Plugin gabungan GPTrustGuard + DropFix untuk Paper 1.21+: sistem trust accept/decline
+  (Java & Bedrock), proteksi jebakan block SHELF (1.21.9+) dengan tag client legacy,
+  proteksi ability/skill RPG pada claim GriefPrevention, serta penyelamat item hilang
+  saat cursor-drop dibatalkan di area proteksi/WorldGuard.
+depend: [GriefPrevention]
+softdepend: [WorldGuard, floodgate, Geyser-Spigot, ViaVersion, MythicLib, MMOItems, MythicMobs]
+folia-supported: false
+
+commands:
+  gpsafeguard:
+    description: Perintah admin GPSafeGuard (gabungan GPTrustGuard & DropFix).
+    usage: /gpsafeguard <reload|debug|shelfguard|dropfix|info>
+    aliases: [gpsg, gptrustguard, gptg]
+    permission: gpsafeguard.admin
+
+permissions:
+  gpsafeguard.admin:
+    description: Akses ke seluruh perintah admin GPSafeGuard.
+    default: op
+  gpsafeguard.bypass.shelfblacklist:
+    description: Bisa menempatkan block SHELF di luar land tanpa diblokir.
+    default: op
+  gpsafeguard.trust.use:
+    description: Bisa menggunakan sistem trust invite (accesstrust/containertrust/trust/permissiontrust).
+    default: true
+  gpsafeguard.bypass.abilityprotection:
+    description: Bypass proteksi ability/damage entity di claim lain.
+    default: false
+  gptrustguard.admin:
+    description: Alias permission lama untuk akses perintah admin.
+    default: op
+  gptrustguard.bypass.shelfblacklist:
+    description: Alias permission lama untuk bypass blacklist block SHELF.
+    default: op
+  gptrustguard.trust.use:
+    description: Alias permission lama untuk sistem trust invite.
+    default: true
+  gptrustguard.bypass.abilityprotection:
+    description: Alias permission lama untuk bypass proteksi ability.
+    default: false

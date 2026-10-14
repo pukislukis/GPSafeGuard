@@ -1,0 +1,148 @@
+# =========================================================
+#  GPSafeGuard - config.yml
+#  Gabungan GPTrustGuard + DropFix:
+#  1. Trust Accept/Decline System (GriefPrevention)
+#  2. Shelf Block Guard & Legacy Client Label (1.21.9+)
+#  3. Ability / Skill Claim Protection (MMOItems, MythicLib, MythicMobs)
+#  4. DropFix (Mencegah item hilang saat cursor-drop dibatalkan di region/claim)
+# =========================================================
+
+# Aktifkan mode debug (log tambahan ke console). Bisa juga di-toggle lewat
+# /gpsafeguard debug
+debug: false
+
+# ---------------------------------------------------------
+# DROP FIX (ANTI-ITEM LOSS SAAT CURSOR DROP DIBATALKAN)
+# ---------------------------------------------------------
+# Mencegah bug item hilang saat di-drop dari cursor (klik kiri/kanan di luar GUI
+# inventory) ketika PlayerDropItemEvent dibatalkan (misal flag WorldGuard
+# item-drop: deny) dan inventory sedang penuh.
+drop-fix:
+  enabled: true
+
+# ---------------------------------------------------------
+# ABILITY / SKILL CLAIM PROTECTION
+# ---------------------------------------------------------
+# Proteksi entity/mob dari ability MMOItems/MythicLib/MythicMobs.
+# Build trust diperlukan di CLAIM TARGET, bukan lokasi penyerang.
+ability-protection:
+  enabled: true
+  hooks:
+    mmoitems: true
+    mythiclib: true
+    mythicmobs: true
+  # Default tidak mengubah aturan PvP pemain milik GP.
+  protect-players: false
+  # Default cast diizinkan; opsional batalkan skill sebelum efek diterapkan.
+  # Memerlukan MythicLib PlayerCastSkillEvent (termasuk ability MMOItems).
+  # Saat true: blokir di claim tanpa build trust atau ada target dilindungi
+  # dalam radius/target eksplisit. Bisa ikut memblokir buff/heal dekat claim.
+  cast-guard:
+    enabled: true
+    radius: 48
+  # Saat cast guard false, hanya ability/effect pada target dilindungi diblokir.
+  # Hit melee/sweep/bow biasa tidak diblokir GPSafeGuard (aturan GP tetap berlaku).
+  # ALL = seluruh target non-player. WHITELIST = hanya daftar mob di bawah.
+  mob-mode: WHITELIST
+  # Daftar mob YANG DILINDINDUNGI, bukan daftar mob yang boleh diserang.
+  # ID vanilla minecraft:<entity>, atau mythicmobs:<internal mob ID>.
+  mob-whitelist:
+    - minecraft:villager
+    - minecraft:wandering_trader
+    - minecraft:allay
+    - minecraft:axolotl
+    - minecraft:bat
+    - minecraft:camel
+    - minecraft:cat
+    - minecraft:copper_golem
+    - minecraft:dolphin
+    - minecraft:donkey
+    - minecraft:fox
+    - minecraft:happy_ghast
+    - minecraft:horse
+    - minecraft:llama
+    - minecraft:mule
+    - minecraft:nautilus
+    - minecraft:ocelot
+    - minecraft:parrot
+    - minecraft:pufferfish
+    - minecraft:skeleton_horse
+    - minecraft:strider
+    - minecraft:trader_llama
+    - minecraft:tropical_fish
+    - minecraft:wolf
+    # - mythicmobs:PetDragon
+  # Fail closed untuk MythicDamageEvent dan Bukkit CUSTOM/MAGIC tanpa pemain
+  # yang bisa diidentifikasi. Termasuk skill mob liar di dalam claim.
+  block-unattributed-skill-damage: true
+  # Bukkit PLUGIN potion dan UNKNOWN knockback tidak menyediakan caster.
+  block-unattributed-plugin-effects: true
+  notify-player: true
+  message-cooldown-seconds: 3
+
+# ---------------------------------------------------------
+# TRUST ACCEPT / DECLINE SYSTEM
+# ---------------------------------------------------------
+# Meng-intercept perintah /trust, /accesstrust, /containertrust, /permissiontrust
+# (dan alias-nya: /t /at /ct /pt) milik GriefPrevention sehingga target player
+# harus meng-accept dulu sebelum trust benar-benar diberikan.
+trust:
+  enabled: true
+
+  # Berapa lama (detik) invite trust menunggu sebelum otomatis expired.
+  invite-timeout-seconds: 30
+
+  # Jika true, player yang sudah punya level trust yang sama/lebih tinggi
+  # di claim tsb tidak perlu invite ulang (langsung ditolak dengan pesan info).
+  skip-if-already-trusted: true
+
+  # Command yang di-intercept.
+  intercepted-commands:
+    trust: ["trust", "t"]
+    accesstrust: ["accesstrust", "at"]
+    containertrust: ["containertrust", "ct"]
+    permissiontrust: ["permissiontrust", "pt"]
+
+# ---------------------------------------------------------
+# SHELF BLOCK GUARD
+# ---------------------------------------------------------
+# Block SHELF (tersedia mulai 1.21.9) secara visual muncul sebagai PLANKS biasa
+# untuk player yang bermain di versi client < 1.21.9 (termasuk player Bedrock
+# via Geyser yang belum update mapping-nya).
+shelf-guard:
+  enabled: true
+
+  # Jika true, block-block di bawah TIDAK BOLEH di-place di luar claim/land
+  # GriefPrevention sama sekali.
+  deny-placement-outside-land: false
+
+  # Jika true, setiap kali block-block di bawah di-place OLEH SIAPA SAJA,
+  # block tersebut akan diberi DISPLAY_TEXT penanda yang HANYA terlihat oleh
+  # player yang bermain di client versi di bawah 1.21.9 (Java via ViaVersion,
+  # Bedrock via Floodgate/Geyser).
+  tag-for-legacy-clients: true
+
+  # Format nama block pada tag, %version% dan %block% akan diganti otomatis.
+  tag-format: "<gray><italic>%version% %block%</italic></gray>"
+  tag-version-label: "1.21.9"
+  # Untuk debug/manual verifikasi atau client tanpa hook deteksi: tampil ke semua.
+  tag-visible-to-all: false
+
+  # Radius (block) untuk menampilkan ulang tag ke player yang baru join/pindah chunk.
+  tag-reveal-radius: 48
+  tag-reveal-interval-ticks: 100
+
+  # Daftar block yang di-blacklist (seluruh 12 varian kayu SHELF bawaan vanilla).
+  blacklisted-blocks:
+    - oak_shelf
+    - spruce_shelf
+    - birch_shelf
+    - jungle_shelf
+    - acacia_shelf
+    - dark_oak_shelf
+    - mangrove_shelf
+    - cherry_shelf
+    - bamboo_shelf
+    - crimson_shelf
+    - warped_shelf
+    - pale_oak_shelf
